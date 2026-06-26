@@ -1,0 +1,92 @@
+.header { margin-bottom: 24px; }
+.title    { font-size: 22px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; }
+.subtitle { font-size: 14px; color: #6b7280; margin: 0; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.card:hover { border-color: #c4b5fd; box-shadow: 0 4px 16px rgba(124,58,237,0.08); }
+.cardOwned  { border-color: #a7f3d0; }
+
+.preview {
+  height: 160px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.previewIcon { font-size: 48px; }
+
+.cardBody { padding: 16px; }
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.cardName { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0; }
+
+.ownedBadge {
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.cardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 14px;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.price { font-size: 18px; font-weight: 700; color: #7c3aed; }
+
+.buyBtn, .ownedBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.buyBtn { background: #7c3aed; color: white; }
+.buyBtn:hover:not(:disabled) { opacity: 0.85; }
+.buyBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ownedBtn { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+
+.skeleton {
+  height: 300px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  border-radius: 14px;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

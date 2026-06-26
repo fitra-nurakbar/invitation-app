@@ -1,0 +1,88 @@
+.header { margin-bottom: 24px; }
+.title    { font-size: 22px; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; }
+.subtitle { font-size: 14px; color: #6b7280; margin: 0; }
+
+.list { display: flex; flex-direction: column; gap: 12px; }
+
+.card {
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.templateName { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 6px; }
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.cardRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.amount { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+
+.badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.badge_yellow { background: #fef3c7; color: #92400e; }
+.badge_green  { background: #d1fae5; color: #065f46; }
+.badge_gray   { background: #f3f4f6; color: #6b7280; }
+.badge_red    { background: #fee2e2; color: #dc2626; }
+
+.actions { display: flex; gap: 8px; }
+
+.payBtn, .cancelBtn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.payBtn    { background: #7c3aed; color: white; }
+.payBtn:hover { opacity: 0.85; }
+
+.cancelBtn { background: #fef2f2; color: #dc2626; }
+.cancelBtn:hover:not(:disabled) { background: #fee2e2; }
+.cancelBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.empty {
+  background: white;
+  border: 1.5px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 60px;
+  text-align: center;
+  color: #6b7280;
+}
+.emptyIcon { font-size: 48px; margin-bottom: 12px; }
+
+.skeleton {
+  height: 88px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  border-radius: 12px;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 768px) {
+  .card { flex-direction: column; align-items: flex-start; }
+  .cardRight { width: 100%; flex-wrap: wrap; }
+}

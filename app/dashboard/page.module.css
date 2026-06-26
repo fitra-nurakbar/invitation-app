@@ -1,0 +1,201 @@
+/* Greeting */
+.greeting {
+  margin-bottom: 28px;
+}
+
+.greetingTitle {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px;
+}
+
+.greetingSubtitle {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1.5px solid #e5e7eb;
+}
+
+.statCard_purple { border-top: 3px solid #7c3aed; }
+.statCard_blue   { border-top: 3px solid #3b82f6; }
+.statCard_green  { border-top: 3px solid #10b981; }
+.statCard_yellow { border-top: 3px solid #f59e0b; }
+
+.statIcon  { font-size: 24px; }
+.statValue { font-size: 32px; font-weight: 700; color: #1a1a2e; margin: 8px 0 2px; }
+.statLabel { font-size: 13px; font-weight: 600; color: #374151; }
+.statSub   { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+
+/* Section */
+.section { margin-bottom: 28px; }
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 14px;
+}
+
+/* Quick Actions */
+.actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.actionCard {
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.actionCard:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+  transform: translateY(-2px);
+}
+
+.actionIcon  { font-size: 28px; }
+.actionLabel { font-size: 13px; font-weight: 600; color: #374151; text-align: center; }
+
+/* Recent Invitation */
+.recentCard {
+  background: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.recentNames {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 6px;
+}
+
+.recentMeta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.recentActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.recentBtn {
+  padding: 8px 16px;
+  background: #7c3aed;
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.recentBtn:hover { opacity: 0.85; }
+
+/* Badge */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge_green  { background: #d1fae5; color: #065f46; }
+.badge_gray   { background: #f3f4f6; color: #6b7280; }
+.badge_red    { background: #fee2e2; color: #dc2626; }
+.badge_yellow { background: #fef3c7; color: #92400e; }
+
+/* Alert */
+.alert {
+  background: #fffbeb;
+  border: 1.5px solid #fcd34d;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+}
+
+.alert span:first-child { font-size: 20px; flex-shrink: 0; }
+.alert strong { display: block; color: #1a1a2e; margin-bottom: 2px; }
+.alert p { color: #6b7280; margin: 0; font-size: 13px; }
+
+.alertBtn {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background: #f59e0b;
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.alertBtn:hover { opacity: 0.85; }
+
+/* Loading */
+.loading { display: flex; flex-direction: column; gap: 16px; }
+
+.skeleton {
+  height: 80px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  border-radius: 12px;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats   { grid-template-columns: 1fr; }
+  .actions { grid-template-columns: 1fr; }
+
+  .recentCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recentActions { width: 100%; }
+  .recentBtn { flex: 1; text-align: center; }
+}
