@@ -1,0 +1,196 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 23, 22, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  padding: 16px;
+  animation: fadeIn 0.15s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: #faf9f6;
+  border: 1px solid #181716;
+  border-radius: 0;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  animation: scaleUp 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #e4dfd5;
+}
+
+.iconWrapDanger {
+  width: 34px;
+  height: 34px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconWrapWarning {
+  width: 34px;
+  height: 34px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconWrapDefault {
+  width: 34px;
+  height: 34px;
+  background: #f4f1ec;
+  color: #181716;
+  border: 1px solid #e4dfd5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: #181716;
+  margin: 0;
+  flex: 1;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6b665f;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeBtn:hover {
+  color: #181716;
+}
+
+.modalBody {
+  padding: 18px 20px;
+}
+
+.message {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #44403c;
+  margin: 0;
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #f4f1ec;
+  border-top: 1px solid #e4dfd5;
+}
+
+.btnCancel {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 0;
+  background: #ffffff;
+  color: #181716;
+  border: 1px solid #d6d0c4;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnCancel:hover {
+  border-color: #181716;
+}
+
+.btnConfirmDanger {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 0;
+  background: #991b1b;
+  color: #ffffff;
+  border: 1px solid #991b1b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnConfirmDanger:hover {
+  background: #7f1d1d;
+  border-color: #7f1d1d;
+}
+
+.btnConfirmDanger:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btnConfirmDefault {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 0;
+  background: #181716;
+  color: #ffffff;
+  border: 1px solid #181716;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnConfirmDefault:hover {
+  background: #8a704c;
+  border-color: #8a704c;
+}
+
+.btnConfirmDefault:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

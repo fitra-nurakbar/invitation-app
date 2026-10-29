@@ -1,0 +1,16 @@
+# Build and dependency artifacts
+.next
+node_modules
+out
+build
+dist
+coverage
+
+# Next.js generated files
+next-env.d.ts
+
+# Package lock
+package-lock.json
+
+# Environment files
+.env*

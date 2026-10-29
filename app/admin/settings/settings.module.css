@@ -1,0 +1,262 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: #181716;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13.5px;
+  color: #6b665f;
+  margin: 0;
+}
+
+.tabNav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e4dfd5;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b665f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: -1px;
+}
+
+.tabBtn:hover {
+  color: #181716;
+  background: #fbf9f5;
+}
+
+.tabBtnActive {
+  color: #181716;
+  background: #ffffff;
+  border-color: #e4dfd5 #e4dfd5 #ffffff #e4dfd5;
+  border-bottom: 2px solid #181716;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e4dfd5;
+  border-radius: 0;
+  padding: 28px;
+}
+
+.cardTitle {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: #181716;
+  margin: 0 0 6px;
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: #6b665f;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #181716;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d9d2c4;
+  border-radius: 0;
+  background: #faf9f6;
+  color: #181716;
+  font-size: 13.5px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.input:focus {
+  border-color: #181716;
+  background: #ffffff;
+}
+
+.inputPassword {
+  padding-right: 42px;
+}
+
+.toggleEyeBtn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #6b665f;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+}
+
+.toggleEyeBtn:hover {
+  color: #181716;
+}
+
+.hint {
+  font-size: 11.5px;
+  color: #8c827a;
+  line-height: 1.4;
+}
+
+.submitBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #181716;
+  color: #ffffff;
+  border: 1px solid #181716;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 8px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #332f2b;
+  border-color: #332f2b;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sideCard {
+  background: #fbf9f5;
+  border: 1px solid #e4dfd5;
+  border-radius: 0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sideTitle {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: #181716;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sideList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideItem {
+  font-size: 12.5px;
+  color: #55504a;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sideIcon {
+  color: #8a704c;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.metaRow {
+  padding-top: 14px;
+  border-top: 1px solid #e4dfd5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaLabel {
+  font-size: 11px;
+  color: #8c827a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metaValue {
+  font-size: 12.5px;
+  color: #181716;
+  font-weight: 500;
+}

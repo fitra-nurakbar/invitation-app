@@ -1,0 +1,127 @@
+.toastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+  width: calc(100% - 48px);
+  pointer-events: none;
+}
+
+.toastItem {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e4dfd5;
+  border-radius: 0;
+  box-shadow: 0 4px 16px rgba(24, 23, 22, 0.08);
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toastItem.closing {
+  animation: fadeOutRight 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+.toastSuccess {
+  border-left: 4px solid #166534;
+  border-color: #e4dfd5;
+}
+
+.toastError {
+  border-left: 4px solid #991b1b;
+  border-color: #e4dfd5;
+}
+
+.toastInfo {
+  border-left: 4px solid #8a704c;
+  border-color: #e4dfd5;
+}
+
+.toastIconWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.toastSuccess .toastIconWrap {
+  color: #166534;
+}
+
+.toastError .toastIconWrap {
+  color: #991b1b;
+}
+
+.toastInfo .toastIconWrap {
+  color: #8a704c;
+}
+
+.toastBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.toastTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #181716;
+  margin: 0 0 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.toastMessage {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #55504a;
+  margin: 0;
+  word-break: break-word;
+}
+
+.toastCloseBtn {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #8c827a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+  margin: -2px -4px 0 0;
+}
+
+.toastCloseBtn:hover {
+  color: #181716;
+}

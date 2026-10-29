@@ -1,81 +1,106 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { useAuth } from '@/hooks/useAuth'
-import { api } from '@/lib/api'
-import type { Invitation, Order, UserTemplate } from '@/types'
-import styles from './page.module.css'
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+import { api } from '@/lib/api';
+import type { Invitation, Order, UserTemplate } from '@/types';
+import {
+  FileText,
+  Layers,
+  ShoppingBag,
+  Plus,
+  Compass,
+  Clock,
+  Calendar,
+  Globe,
+  ArrowRight,
+  AlertCircle,
+  MessageSquare,
+} from 'lucide-react';
+import styles from './page.module.css';
+
+function getPersonName(person: unknown): string {
+  if (!person) return '—';
+  if (typeof person === 'string') return person;
+  if (typeof person === 'object' && person !== null && 'name' in person) {
+    return String((person as { name?: unknown }).name || '—');
+  }
+  return '—';
+}
 
 export default function DashboardPage() {
-  const { user, token } = useAuth()
+  const { user, token } = useAuth();
 
-  const [invitations, setInvitations]   = useState<Invitation[]>([])
-  const [orders, setOrders]             = useState<Order[]>([])
-  const [myTemplates, setMyTemplates]   = useState<UserTemplate[]>([])
-  const [loading, setLoading]           = useState(true)
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [myTemplates, setMyTemplates] = useState<UserTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return
+    if (!token) return;
     const fetchAll = async () => {
       try {
         const [invRes, ordRes, tmplRes] = await Promise.all([
           api.getInvitations(token),
           api.getOrders(token),
           api.getMyTemplates(token),
-        ])
-        setInvitations(invRes.data || [])
-        setOrders(ordRes.data || [])
-        setMyTemplates(tmplRes.data || [])
+        ]);
+        setInvitations(invRes.data || []);
+        setOrders(ordRes.data || []);
+        setMyTemplates(tmplRes.data || []);
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchAll()
-  }, [token])
+    };
+    fetchAll();
+  }, [token]);
 
-  const activeInvitations = invitations.filter(i => i.status === 'active').length
-  const pendingOrders     = orders.filter(o => o.status === 'pending').length
-  const recentInvitation  = invitations[0]
+  const activeInvitations = invitations.filter(i => i.status === 'active').length;
+  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+  const totalRsvpCount = invitations.reduce((acc, inv) => {
+    return acc + (Array.isArray(inv.messages) ? inv.messages.length : 0);
+  }, 0);
+  const recentInvitation = invitations[0];
 
-  if (loading) return <LoadingState />
+  if (loading) return <LoadingState />;
 
   return (
     <div>
       {/* Greeting */}
       <div className={styles.greeting}>
-        <h1 className={styles.greetingTitle}>
-          Halo, {user?.name?.split(' ')[0]} 👋
-        </h1>
-        <p className={styles.greetingSubtitle}>
-          Kelola undangan digital kamu dari sini
-        </p>
+        <h1 className={styles.greetingTitle}>Selamat datang, {user?.name?.split(' ')[0]}</h1>
+        <p className={styles.greetingSubtitle}>Ikhtisar dan pengelolaan undangan digital Anda</p>
       </div>
 
       {/* Stats */}
       <div className={styles.stats}>
         <StatCard
-          icon="💌"
+          icon={FileText}
           label="Total Undangan"
           value={invitations.length}
           sub={`${activeInvitations} aktif`}
-          color="purple"
         />
         <StatCard
-          icon="🎨"
+          icon={MessageSquare}
+          label="Ucapan & RSVP"
+          value={totalRsvpCount}
+          sub="Total respon buku tamu"
+        />
+        <StatCard
+          icon={Layers}
           label="Template Dimiliki"
           value={myTemplates.length}
-          sub="template aktif"
-          color="blue"
+          sub="Koleksi template aktif"
         />
         <StatCard
-          icon="🧾"
-          label="Total Order"
+          icon={ShoppingBag}
+          label="Total Pesanan"
           value={orders.length}
-          sub={pendingOrders > 0 ? `${pendingOrders} menunggu bayar` : 'semua selesai'}
-          color={pendingOrders > 0 ? 'yellow' : 'green'}
+          sub={pendingOrders > 0 ? `${pendingOrders} menunggu bayar` : 'Semua transaksi selesai'}
+          highlight={pendingOrders > 0}
         />
       </div>
 
@@ -84,16 +109,16 @@ export default function DashboardPage() {
         <h2 className={styles.sectionTitle}>Aksi Cepat</h2>
         <div className={styles.actions}>
           <Link href="/dashboard/invitations/create" className={styles.actionCard}>
-            <span className={styles.actionIcon}>✏️</span>
+            <Plus size={20} strokeWidth={1.75} className={styles.actionIcon} />
             <span className={styles.actionLabel}>Buat Undangan Baru</span>
           </Link>
           <Link href="/dashboard/templates" className={styles.actionCard}>
-            <span className={styles.actionIcon}>🛒</span>
-            <span className={styles.actionLabel}>Browse Template</span>
+            <Compass size={20} strokeWidth={1.75} className={styles.actionIcon} />
+            <span className={styles.actionLabel}>Katalog Template</span>
           </Link>
           <Link href="/dashboard/orders" className={styles.actionCard}>
-            <span className={styles.actionIcon}>📋</span>
-            <span className={styles.actionLabel}>Lihat Riwayat Order</span>
+            <Clock size={20} strokeWidth={1.75} className={styles.actionIcon} />
+            <span className={styles.actionLabel}>Riwayat Pesanan</span>
           </Link>
         </div>
       </div>
@@ -105,13 +130,21 @@ export default function DashboardPage() {
           <div className={styles.recentCard}>
             <div className={styles.recentInfo}>
               <div className={styles.recentNames}>
-                {recentInvitation.detail?.groom} & {recentInvitation.detail?.bride}
+                {getPersonName(recentInvitation.detail?.groom)} &{' '}
+                {getPersonName(recentInvitation.detail?.bride)}
               </div>
               <div className={styles.recentMeta}>
-                <span>📅 {new Date(recentInvitation.event_date).toLocaleDateString('id-ID', {
-                  day: 'numeric', month: 'long', year: 'numeric'
-                })}</span>
-                <span>🔗 /{recentInvitation.slug}</span>
+                <span>
+                  <Calendar size={13} strokeWidth={1.75} />
+                  {new Date(recentInvitation.event_date).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span>
+                  <Globe size={13} strokeWidth={1.75} />/{recentInvitation.slug}
+                </span>
               </div>
             </div>
             <div className={styles.recentActions}>
@@ -120,7 +153,8 @@ export default function DashboardPage() {
                 href={`/dashboard/invitations/${recentInvitation.id}`}
                 className={styles.recentBtn}
               >
-                Kelola →
+                <span>Kelola</span>
+                <ArrowRight size={14} strokeWidth={1.75} />
               </Link>
             </div>
           </div>
@@ -130,10 +164,10 @@ export default function DashboardPage() {
       {/* Pending Orders Alert */}
       {pendingOrders > 0 && (
         <div className={styles.alert}>
-          <span>⚠️</span>
-          <div>
-            <strong>Kamu punya {pendingOrders} order yang menunggu pembayaran</strong>
-            <p>Selesaikan pembayaran sebelum invoice expired.</p>
+          <AlertCircle size={20} strokeWidth={1.75} className={styles.alertIcon} />
+          <div className={styles.alertText}>
+            <strong>Terdapat {pendingOrders} pesanan menunggu pembayaran</strong>
+            <p>Silakan selesaikan pembayaran sebelum batas waktu kedaluwarsa.</p>
           </div>
           <Link href="/dashboard/orders" className={styles.alertBtn}>
             Bayar Sekarang
@@ -141,36 +175,44 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ─── Sub Components ───────────────────────────────────────────
 
-function StatCard({ icon, label, value, sub, color }: {
-  icon: string
-  label: string
-  value: number
-  sub: string
-  color: 'purple' | 'blue' | 'green' | 'yellow'
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  highlight = false,
+}: {
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  label: string;
+  value: number;
+  sub: string;
+  highlight?: boolean;
 }) {
   return (
-    <div className={`${styles.statCard} ${styles[`statCard_${color}`]}`}>
-      <span className={styles.statIcon}>{icon}</span>
+    <div className={`${styles.statCard} ${highlight ? styles.statCardHighlight : ''}`}>
+      <div className={styles.statHeader}>
+        <span className={styles.statLabel}>{label}</span>
+        <Icon size={18} strokeWidth={1.75} className={styles.statIcon} />
+      </div>
       <div className={styles.statValue}>{value}</div>
-      <div className={styles.statLabel}>{label}</div>
       <div className={styles.statSub}>{sub}</div>
     </div>
-  )
+  );
 }
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
-    active:  { label: 'Aktif',   cls: 'green'  },
-    draft:   { label: 'Draft',   cls: 'gray'   },
-    expired: { label: 'Expired', cls: 'red'    },
-  }
-  const s = map[status] || { label: status, cls: 'gray' }
-  return <span className={`${styles.badge} ${styles[`badge_${s.cls}`]}`}>{s.label}</span>
+    active: { label: 'Aktif', cls: 'green' },
+    draft: { label: 'Draf', cls: 'gray' },
+    expired: { label: 'Kedaluwarsa', cls: 'red' },
+  };
+  const s = map[status] || { label: status, cls: 'gray' };
+  return <span className={`${styles.badge} ${styles[`badge_${s.cls}`]}`}>{s.label}</span>;
 }
 
 function LoadingState() {
@@ -180,5 +222,5 @@ function LoadingState() {
         <div key={i} className={styles.skeleton} />
       ))}
     </div>
-  )
+  );
 }

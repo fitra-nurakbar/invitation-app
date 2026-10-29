@@ -1,49 +1,53 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { api } from '@/lib/api'
-import { useAuth } from '@/hooks/useAuth'
-import styles from './callback.module.css'
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { api } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
+import styles from './callback.module.css';
 
 export default function CallbackPage() {
-  const router       = useRouter()
-  const searchParams = useSearchParams()
-  const { saveAuth } = useAuth()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { saveAuth } = useAuth();
 
-  const [status, setStatus]   = useState<'loading' | 'success' | 'error'>('loading')
-  const [message, setMessage] = useState('')
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const token = searchParams.get('token')
+    const token = searchParams.get('token');
 
     if (!token) {
-      setStatus('error')
-      setMessage('Token tidak ditemukan')
-      return
+      setStatus('error');
+      setMessage('Token tidak ditemukan');
+      return;
     }
 
     const handleCallback = async () => {
       try {
-        // Kalau token dari magic link verify-api — sudah JWT langsung
-        // Kalau dari Google OAuth redirect — juga sudah JWT
-        // Coba decode atau verify via /auth/me
+        const res = await api.getMe(token);
+        const user = res?.data;
 
-        const res = await api.getMe(token)
-        saveAuth(token, res.data)
+        if (!user || typeof user !== 'object' || !user.id) {
+          throw new Error('Data user tidak valid atau tidak ditemukan');
+        }
 
-        setStatus('success')
+        saveAuth(token, user);
+
+        setStatus('success');
         setTimeout(() => {
-          router.push('/dashboard')
-        }, 1500)
-      } catch {
-        setStatus('error')
-        setMessage('Token tidak valid atau sudah expired')
+          router.push('/dashboard');
+        }, 1500);
+      } catch (err: unknown) {
+        setStatus('error');
+        const msg = err instanceof Error ? err.message : 'Token tidak valid atau sudah expired';
+        setMessage(msg);
       }
-    }
+    };
 
-    handleCallback()
-  }, [searchParams, saveAuth, router])
+    handleCallback();
+  }, [searchParams, saveAuth, router]);
 
   return (
     <div className={styles.container}>
@@ -51,32 +55,33 @@ export default function CallbackPage() {
         {status === 'loading' && (
           <>
             <div className={styles.spinner} />
-            <p className={styles.text}>Memverifikasi...</p>
+            <p className={styles.text}>Memverifikasi sesi...</p>
           </>
         )}
 
         {status === 'success' && (
           <>
-            <div className={styles.icon}>✅</div>
-            <h2 className={styles.title}>Login Berhasil!</h2>
+            <div className={styles.iconSuccess}>
+              <CheckCircle2 size={36} strokeWidth={1.75} />
+            </div>
+            <h2 className={styles.title}>Verifikasi Berhasil</h2>
             <p className={styles.text}>Mengalihkan ke dashboard...</p>
           </>
         )}
 
         {status === 'error' && (
           <>
-            <div className={styles.icon}>❌</div>
-            <h2 className={styles.title}>Gagal Login</h2>
+            <div className={styles.iconError}>
+              <AlertCircle size={36} strokeWidth={1.75} />
+            </div>
+            <h2 className={styles.title}>Gagal Masuk</h2>
             <p className={styles.text}>{message}</p>
-            <button
-              className={styles.btn}
-              onClick={() => router.push('/auth/login')}
-            >
+            <button className={styles.btn} onClick={() => router.push('/auth/login')}>
               Kembali ke Login
             </button>
           </>
         )}
       </div>
     </div>
-  )
+  );
 }

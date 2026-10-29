@@ -1,6 +1,6 @@
-import { Suspense } from 'react'
-import CallbackContent from './CallbackContent'
-import styles from './callback.module.css'
+import { Suspense } from 'react';
+import CallbackContent from './CallbackContent';
+import styles from './callback.module.css';
 
 // Page utama — wajib export default, bungkus dengan Suspense
 export default function CallbackPage() {
@@ -8,7 +8,7 @@ export default function CallbackPage() {
     <Suspense fallback={<LoadingScreen />}>
       <CallbackContent />
     </Suspense>
-  )
+  );
 }
 
 function LoadingScreen() {
@@ -19,5 +19,5 @@ function LoadingScreen() {
         <p className={styles.text}>Memuat...</p>
       </div>
     </div>
-  )
+  );
 }
