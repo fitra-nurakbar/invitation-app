@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:parity": "node components/invitation/route-parity.test.mjs && node components/invitation/renderer-parity.test.mjs && node components/invitation/invitation-adapter.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.63.0",

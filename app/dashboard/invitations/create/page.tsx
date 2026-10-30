@@ -23,6 +23,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import styles from '../form.module.css';
+import { LivePreview } from './live-preview';
 
 const AUDIO_PRESETS = [
   {
@@ -59,6 +60,7 @@ export default function CreateInvitationPage() {
 
   // Form states
   const [templateId, setTemplateId] = useState('');
+  const selectedTemplate = myTemplates.find(item => item.template_id === templateId)?.template;
   const [slug, setSlug] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [coverImage, setCoverImage] = useState('');
@@ -340,7 +342,7 @@ export default function CreateInvitationPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${styles.createContainer}`}>
       <div className={styles.header}>
         <Link href="/dashboard/invitations" className={styles.backLink}>
           <ArrowLeft size={14} strokeWidth={1.75} />
@@ -359,539 +361,346 @@ export default function CreateInvitationPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Step 1: Pilih Template */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>1. Pilih Desain Template</h2>
-          <p className={styles.sectionDesc}>Pilih dari template yang sudah kamu miliki di akunmu</p>
+      <div className={styles.createWorkspace}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Step 1: Pilih Template */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>1. Pilih Desain Template</h2>
+            <p className={styles.sectionDesc}>
+              Pilih dari template yang sudah kamu miliki di akunmu
+            </p>
 
-          {loadingTemplates ? (
-            <p>Memuat template...</p>
-          ) : myTemplates.length === 0 ? (
-            <div className={styles.emptyTemplates}>
-              Kamu belum memiliki template.{' '}
-              <Link href="/dashboard/templates">
-                Beli atau aktifkan template gratis terlebih dahulu
-              </Link>
-            </div>
-          ) : (
-            <div className={styles.templateSelect}>
-              {myTemplates.map(ut => {
-                const tmpl = ut.template;
-                const isSelected = templateId === ut.template_id;
-                return (
-                  <div
-                    key={ut.id}
-                    className={`${styles.templateOption} ${isSelected ? styles.templateOptionSelected : ''}`}
-                    onClick={() => setTemplateId(ut.template_id)}
-                  >
-                    <span className={styles.templateName}>{tmpl?.name || 'Template'}</span>
-                    <span className={styles.templateMeta}>
-                      Aktif {tmpl?.active_days_after || 30} hari pasca acara
-                    </span>
-                    {isSelected && (
-                      <span className={styles.templateSelectedBadge}>
-                        <Check size={13} strokeWidth={2} /> Terpilih
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Step 2: Info Dasar */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>2. Tautan & Tanggal Acara</h2>
-          <p className={styles.sectionDesc}>
-            Atur alamat URL unik dan tanggal puncak acara pernikahan
-          </p>
-
-          <div className={styles.grid2}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>
-                Slug URL Undangan <span className={styles.required}>*</span>
-              </label>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: budi-dan-ani"
-                  value={slug}
-                  onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={handleGenerateSlug}
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #d1d5db',
-                    background: '#f3f4f6',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    whiteSpace: 'nowrap',
-                  }}
-                  title="Generate otomatis dari nama mempelai"
-                >
-                  Otomatis
-                </button>
+            {loadingTemplates ? (
+              <p>Memuat template...</p>
+            ) : myTemplates.length === 0 ? (
+              <div className={styles.emptyTemplates}>
+                Kamu belum memiliki template.{' '}
+                <Link href="/dashboard/templates">
+                  Beli atau aktifkan template gratis terlebih dahulu
+                </Link>
               </div>
-              <div className={styles.slugPreview}>Preview link: /{slug || 'nama-slug'}</div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>
-                Tanggal Acara Utama <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="date"
-                className={styles.input}
-                value={eventDate}
-                onChange={e => {
-                  setEventDate(e.target.value);
-                  setEvents(prev =>
-                    prev.map(ev => (!ev.date ? { ...ev, date: e.target.value } : ev))
-                  );
-                }}
-                required
-              />
-              <span className={styles.hint}>Tanggal yang digunakan untuk hitung mundur acara</span>
-            </div>
-
-            <div className={styles.formGroup} style={{ gridColumn: 'span 2' }}>
-              <label className={styles.label}>
-                <span>Foto Sampul / Banner Cover (Opsional)</span>
-              </label>
-              <div className={styles.uploadRow}>
-                <input
-                  type="url"
-                  className={styles.input}
-                  placeholder="https://... atau unggah gambar sampul"
-                  value={coverImage}
-                  onChange={e => setCoverImage(e.target.value)}
-                />
-                <label className={styles.uploadBtn}>
-                  {uploadingField === 'cover' ? (
-                    <Loader2 size={13} className={styles.spinner} />
-                  ) : (
-                    <Upload size={13} strokeWidth={1.75} />
-                  )}
-                  <span>{uploadingField === 'cover' ? 'Mengunggah...' : 'Unggah Cover'}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className={styles.uploadHiddenInput}
-                    disabled={uploadingField === 'cover'}
-                    onChange={e => handleFileUpload(e, 'cover', setCoverImage)}
-                  />
-                </label>
-              </div>
-              <span className={styles.hint}>
-                Foto sampul utama yang digunakan pada preview Open Graph dan header undangan.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Step 3: Profil Mempelai */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>3. Profil Mempelai</h2>
-          <p className={styles.sectionDesc}>Informasi kedua calon mempelai beserta orang tua</p>
-
-          <div className={styles.grid2}>
-            {/* Groom */}
-            <div
-              style={{
-                padding: '16px',
-                background: 'var(--bg-primary, #faf9f6)',
-                border: '1px solid var(--border-light, #e4dfd5)',
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: '14.5px',
-                  fontWeight: 600,
-                  margin: '0 0 12px',
-                  color: 'var(--text-main, #181716)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                <User size={15} strokeWidth={1.75} />
-                <span>Mempelai Pria</span>
-              </h3>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>
-                  Nama Lengkap <span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: Budi Santoso, S.Kom"
-                  value={groomName}
-                  onChange={e => setGroomName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Kota Asal / Lahir</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: Jakarta"
-                  value={groomBirth}
-                  onChange={e => setGroomBirth(e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Nama Orang Tua</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: Putra dari Bpk. Hendra & Ibu Dewi"
-                  value={groomParents}
-                  onChange={e => setGroomParents(e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Foto Mempelai Pria (Opsional)</label>
-                <div className={styles.uploadRow}>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    placeholder="https://... atau unggah foto"
-                    value={groomPhoto}
-                    onChange={e => setGroomPhoto(e.target.value)}
-                  />
-                  <label className={styles.uploadBtn}>
-                    {uploadingField === 'groom' ? (
-                      <Loader2 size={13} className={styles.spinner} />
-                    ) : (
-                      <Upload size={13} strokeWidth={1.75} />
-                    )}
-                    <span>{uploadingField === 'groom' ? 'Mengunggah...' : 'Unggah'}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className={styles.uploadHiddenInput}
-                      disabled={uploadingField === 'groom'}
-                      onChange={e => handleFileUpload(e, 'groom', setGroomPhoto)}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Bride */}
-            <div
-              style={{
-                padding: '16px',
-                background: 'var(--bg-primary, #faf9f6)',
-                border: '1px solid var(--border-light, #e4dfd5)',
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: '14.5px',
-                  fontWeight: 600,
-                  margin: '0 0 12px',
-                  color: 'var(--text-main, #181716)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                <User size={15} strokeWidth={1.75} />
-                <span>Mempelai Wanita</span>
-              </h3>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>
-                  Nama Lengkap <span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: Ani Lestari, S.E"
-                  value={brideName}
-                  onChange={e => setBrideName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Kota Asal / Lahir</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: Bandung"
-                  value={brideBirth}
-                  onChange={e => setBrideBirth(e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Nama Orang Tua</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="misal: Putri dari Bpk. Surya & Ibu Ratna"
-                  value={brideParents}
-                  onChange={e => setBrideParents(e.target.value)}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Foto Mempelai Wanita (Opsional)</label>
-                <div className={styles.uploadRow}>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    placeholder="https://... atau unggah foto"
-                    value={bridePhoto}
-                    onChange={e => setBridePhoto(e.target.value)}
-                  />
-                  <label className={styles.uploadBtn}>
-                    {uploadingField === 'bride' ? (
-                      <Loader2 size={13} className={styles.spinner} />
-                    ) : (
-                      <Upload size={13} strokeWidth={1.75} />
-                    )}
-                    <span>{uploadingField === 'bride' ? 'Mengunggah...' : 'Unggah'}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className={styles.uploadHiddenInput}
-                      disabled={uploadingField === 'bride'}
-                      onChange={e => handleFileUpload(e, 'bride', setBridePhoto)}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Step 4: Rangkaian Acara Fleksibel */}
-        <div className={styles.section}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              flexWrap: 'wrap',
-              gap: '10px',
-            }}
-          >
-            <div>
-              <h2 className={styles.sectionTitle}>4. Rangkaian Acara Fleksibel</h2>
-              <p className={styles.sectionDesc}>
-                Atur jadwal dan lokasi prosesi pernikahan (Akad, Resepsi, Siraman, Unduh Mantu,
-                dll.)
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleAddEvent}
-              className={styles.btnAddEvent}
-              style={{ marginTop: 0 }}
-            >
-              <Plus size={13} strokeWidth={2} />
-              <span>+ Tambah Acara</span>
-            </button>
-          </div>
-
-          <div className={styles.eventCardList}>
-            {events.map((evt, idx) => (
-              <div key={idx} className={styles.eventCardItem}>
-                <div className={styles.eventCardHeader}>
-                  <div className={styles.eventCardHeaderTitle}>
-                    <span className={styles.eventCardIndex}>Acara #{idx + 1}</span>
-                    <span>{evt.name || `Rangkaian Acara ${idx + 1}`}</span>
-                  </div>
-                  {events.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveEvent(idx)}
-                      className={styles.btnRemoveEvent}
-                      title="Hapus Acara Ini"
+            ) : (
+              <div className={styles.templateSelect}>
+                {myTemplates.map(ut => {
+                  const tmpl = ut.template;
+                  const isSelected = templateId === ut.template_id;
+                  return (
+                    <div
+                      key={ut.id}
+                      className={`${styles.templateOption} ${isSelected ? styles.templateOptionSelected : ''}`}
+                      onClick={() => setTemplateId(ut.template_id)}
                     >
-                      <Trash2 size={12} strokeWidth={1.75} />
-                      <span>Hapus</span>
-                    </button>
-                  )}
-                </div>
+                      <span className={styles.templateName}>{tmpl?.name || 'Template'}</span>
+                      <span className={styles.templateMeta}>
+                        Aktif {tmpl?.active_days_after || 30} hari pasca acara
+                      </span>
+                      {isSelected && (
+                        <span className={styles.templateSelectedBadge}>
+                          <Check size={13} strokeWidth={2} /> Terpilih
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-                <div className={styles.grid3}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>
-                      Nama Acara <span className={styles.required}>*</span>
+          {/* Step 2: Info Dasar */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>2. Tautan & Tanggal Acara</h2>
+            <p className={styles.sectionDesc}>
+              Atur alamat URL unik dan tanggal puncak acara pernikahan
+            </p>
+
+            <div className={styles.grid2}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  Slug URL Undangan <span className={styles.required}>*</span>
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: budi-dan-ani"
+                    value={slug}
+                    onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={handleGenerateSlug}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid #d1d5db',
+                      background: '#f3f4f6',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title="Generate otomatis dari nama mempelai"
+                  >
+                    Otomatis
+                  </button>
+                </div>
+                <div className={styles.slugPreview}>Preview link: /{slug || 'nama-slug'}</div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  Tanggal Acara Utama <span className={styles.required}>*</span>
+                </label>
+                <input
+                  type="date"
+                  className={styles.input}
+                  value={eventDate}
+                  onChange={e => {
+                    setEventDate(e.target.value);
+                    setEvents(prev =>
+                      prev.map(ev => (!ev.date ? { ...ev, date: e.target.value } : ev))
+                    );
+                  }}
+                  required
+                />
+                <span className={styles.hint}>
+                  Tanggal yang digunakan untuk hitung mundur acara
+                </span>
+              </div>
+
+              <div className={styles.formGroup} style={{ gridColumn: 'span 2' }}>
+                <label className={styles.label}>
+                  <span>Foto Sampul / Banner Cover (Opsional)</span>
+                </label>
+                <div className={styles.uploadRow}>
+                  <label className={styles.uploadBtn}>
+                    {uploadingField === 'cover' ? (
+                      <Loader2 size={13} className={styles.spinner} />
+                    ) : (
+                      <Upload size={13} strokeWidth={1.75} />
+                    )}
+                    <span>{uploadingField === 'cover' ? 'Mengunggah...' : 'Unggah Cover'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className={styles.uploadHiddenInput}
+                      disabled={uploadingField === 'cover'}
+                      onChange={e => handleFileUpload(e, 'cover', setCoverImage)}
+                    />
+                  </label>
+                </div>
+                <span className={styles.hint}>
+                  Foto sampul utama yang digunakan pada preview Open Graph dan header undangan.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 3: Profil Mempelai */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>3. Profil Mempelai</h2>
+            <p className={styles.sectionDesc}>Informasi kedua calon mempelai beserta orang tua</p>
+
+            <div className={styles.grid2}>
+              {/* Groom */}
+              <div
+                style={{
+                  padding: '16px',
+                  background: 'var(--bg-primary, #faf9f6)',
+                  border: '1px solid var(--border-light, #e4dfd5)',
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '14.5px',
+                    fontWeight: 600,
+                    margin: '0 0 12px',
+                    color: 'var(--text-main, #181716)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <User size={15} strokeWidth={1.75} />
+                  <span>Mempelai Pria</span>
+                </h3>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Nama Lengkap <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: Budi Santoso, S.Kom"
+                    value={groomName}
+                    onChange={e => setGroomName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Kota Asal / Lahir</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: Jakarta"
+                    value={groomBirth}
+                    onChange={e => setGroomBirth(e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Nama Orang Tua</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: Putra dari Bpk. Hendra & Ibu Dewi"
+                    value={groomParents}
+                    onChange={e => setGroomParents(e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Foto Mempelai Pria (Opsional)</label>
+                  <div className={styles.uploadRow}>
+                    <label className={styles.uploadBtn}>
+                      {uploadingField === 'groom' ? (
+                        <Loader2 size={13} className={styles.spinner} />
+                      ) : (
+                        <Upload size={13} strokeWidth={1.75} />
+                      )}
+                      <span>{uploadingField === 'groom' ? 'Mengunggah...' : 'Unggah'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className={styles.uploadHiddenInput}
+                        disabled={uploadingField === 'groom'}
+                        onChange={e => handleFileUpload(e, 'groom', setGroomPhoto)}
+                      />
                     </label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="misal: Akad Nikah, Resepsi, Siraman"
-                      value={evt.name}
-                      onChange={e => handleUpdateEvent(idx, 'name', e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Tanggal Acara</label>
-                    <input
-                      type="date"
-                      className={styles.input}
-                      value={evt.date}
-                      onChange={e => handleUpdateEvent(idx, 'date', e.target.value)}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Waktu Acara</label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="misal: 08:00 - 10:00 WIB"
-                      value={evt.time}
-                      onChange={e => handleUpdateEvent(idx, 'time', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.grid3}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Nama Tempat / Gedung</label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="misal: Masjid Al-Ikhlas"
-                      value={evt.place}
-                      onChange={e => handleUpdateEvent(idx, 'place', e.target.value)}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Alamat Lengkap</label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="misal: Jl. Melati No. 10, Jakarta Selatan"
-                      value={evt.address || ''}
-                      onChange={e => handleUpdateEvent(idx, 'address', e.target.value)}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Tautan Google Maps</label>
-                    <input
-                      type="url"
-                      className={styles.input}
-                      placeholder="https://maps.google.com/..."
-                      value={evt.maps_url || ''}
-                      onChange={e => handleUpdateEvent(idx, 'maps_url', e.target.value)}
-                    />
                   </div>
                 </div>
               </div>
-            ))}
+
+              {/* Bride */}
+              <div
+                style={{
+                  padding: '16px',
+                  background: 'var(--bg-primary, #faf9f6)',
+                  border: '1px solid var(--border-light, #e4dfd5)',
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '14.5px',
+                    fontWeight: 600,
+                    margin: '0 0 12px',
+                    color: 'var(--text-main, #181716)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <User size={15} strokeWidth={1.75} />
+                  <span>Mempelai Wanita</span>
+                </h3>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Nama Lengkap <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: Ani Lestari, S.E"
+                    value={brideName}
+                    onChange={e => setBrideName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Kota Asal / Lahir</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: Bandung"
+                    value={brideBirth}
+                    onChange={e => setBrideBirth(e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Nama Orang Tua</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="misal: Putri dari Bpk. Surya & Ibu Ratna"
+                    value={brideParents}
+                    onChange={e => setBrideParents(e.target.value)}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Foto Mempelai Wanita (Opsional)</label>
+                  <div className={styles.uploadRow}>
+                    <label className={styles.uploadBtn}>
+                      {uploadingField === 'bride' ? (
+                        <Loader2 size={13} className={styles.spinner} />
+                      ) : (
+                        <Upload size={13} strokeWidth={1.75} />
+                      )}
+                      <span>{uploadingField === 'bride' ? 'Mengunggah...' : 'Unggah'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className={styles.uploadHiddenInput}
+                        disabled={uploadingField === 'bride'}
+                        onChange={e => handleFileUpload(e, 'bride', setBridePhoto)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <button type="button" onClick={handleAddEvent} className={styles.btnAddEvent}>
-            <Plus size={13} strokeWidth={2} />
-            <span>+ Tambah Rangkaian Acara Lainnya</span>
-          </button>
-        </div>
-
-        {/* Step 5: Quotes & Hadiah */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>5. Kutipan / Doa & Amplop Digital</h2>
-          <p className={styles.sectionDesc}>
-            Kutipan ayat suci dan rekening untuk kado pernikahan digital
-          </p>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Kutipan Kata Mutiara / Doa</label>
-            <textarea
-              className={styles.textarea}
-              value={quoteText}
-              onChange={e => setQuoteText(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Sumber / Tokoh / Ayat</label>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="misal: QS. Ar-Rum: 21"
-              value={quoteAttribution}
-              onChange={e => setQuoteAttribution(e.target.value)}
-            />
-          </div>
-
-          <div
-            style={{
-              marginTop: '20px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--border-light, #e4dfd5)',
-            }}
-          >
+          {/* Step 4: Rangkaian Acara Fleksibel */}
+          <div className={styles.section}>
             <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '12px',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap',
+                gap: '10px',
               }}
             >
-              <h3
-                style={{
-                  fontSize: '14.5px',
-                  fontWeight: 600,
-                  color: 'var(--text-main, #181716)',
-                  margin: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                <Gift size={15} strokeWidth={1.75} />
-                <span>Amplop Digital &amp; Multi-Rekening (Opsional)</span>
-              </h3>
+              <div>
+                <h2 className={styles.sectionTitle}>4. Rangkaian Acara Fleksibel</h2>
+                <p className={styles.sectionDesc}>
+                  Atur jadwal dan lokasi prosesi pernikahan (Akad, Resepsi, Siraman, Unduh Mantu,
+                  dll.)
+                </p>
+              </div>
               <button
                 type="button"
-                onClick={handleAddGift}
-                className={styles.btnAddGift}
-                style={{ margin: 0 }}
+                onClick={handleAddEvent}
+                className={styles.btnAddEvent}
+                style={{ marginTop: 0 }}
               >
                 <Plus size={13} strokeWidth={2} />
-                <span>Tambah Rekening / QRIS</span>
+                <span>Tambah Acara</span>
               </button>
             </div>
 
-            <p
-              style={{
-                fontSize: '12.5px',
-                color: 'var(--text-muted, #6b665f)',
-                marginBottom: '14px',
-              }}
-            >
-              Anda dapat menambahkan beberapa rekening bank atau QRIS donasi sekaligus agar
-              memudahkan tamu memberikan tanda kasih.
-            </p>
-
-            <div className={styles.giftCardList}>
-              {gifts.map((gift, idx) => (
-                <div key={idx} className={styles.giftCardItem}>
-                  <div className={styles.giftCardHeader}>
-                    <span className={styles.giftCardIndex}>Rekening / QRIS #{idx + 1}</span>
-                    {gifts.length > 1 && (
+            <div className={styles.eventCardList}>
+              {events.map((evt, idx) => (
+                <div key={idx} className={styles.eventCardItem}>
+                  <div className={styles.eventCardHeader}>
+                    <div className={styles.eventCardHeaderTitle}>
+                      <span className={styles.eventCardIndex}>Acara #{idx + 1}</span>
+                      <span>{evt.name || `Rangkaian Acara ${idx + 1}`}</span>
+                    </div>
+                    {events.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveGift(idx)}
-                        className={styles.btnRemoveGift}
-                        title="Hapus Rekening Ini"
+                        onClick={() => handleRemoveEvent(idx)}
+                        className={styles.btnRemoveEvent}
+                        title="Hapus Acara Ini"
                       >
                         <Trash2 size={12} strokeWidth={1.75} />
                         <span>Hapus</span>
@@ -901,285 +710,457 @@ export default function CreateInvitationPage() {
 
                   <div className={styles.grid3}>
                     <div className={styles.formGroup}>
-                      <label className={styles.label}>Penyedia Layanan / Platform</label>
-                      <select
-                        className={styles.select}
-                        value={gift.platform}
-                        onChange={e => handleUpdateGift(idx, 'platform', e.target.value)}
-                      >
-                        <option value="BCA">BCA (Bank Central Asia)</option>
-                        <option value="Mandiri">Bank Mandiri</option>
-                        <option value="BRI">Bank BRI</option>
-                        <option value="BNI">Bank BNI</option>
-                        <option value="BSI">Bank Syariah Indonesia (BSI)</option>
-                        <option value="Bank Jago">Bank Jago</option>
-                        <option value="CIMB">CIMB Niaga</option>
-                        <option value="GoPay">GoPay</option>
-                        <option value="OVO">OVO</option>
-                        <option value="DANA">DANA</option>
-                        <option value="ShopeePay">ShopeePay</option>
-                        <option value="QRIS">QRIS Standar</option>
-                      </select>
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Atas Nama Rekening</label>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder="misal: Budi Santoso"
-                        value={gift.name}
-                        onChange={e => handleUpdateGift(idx, 'name', e.target.value)}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
                       <label className={styles.label}>
-                        {gift.platform === 'QRIS' ? 'Nomor / Kode QRIS' : 'Nomor Rekening / No. HP'}
+                        Nama Acara <span className={styles.required}>*</span>
                       </label>
                       <input
                         type="text"
                         className={styles.input}
-                        placeholder={
-                          gift.platform === 'QRIS' ? 'NMID / Kode Merchant' : 'misal: 1234567890'
-                        }
-                        value={gift.id}
-                        onChange={e => handleUpdateGift(idx, 'id', e.target.value)}
+                        placeholder="misal: Akad Nikah, Resepsi, Siraman"
+                        value={evt.name}
+                        onChange={e => handleUpdateEvent(idx, 'name', e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Tanggal Acara</label>
+                      <input
+                        type="date"
+                        className={styles.input}
+                        value={evt.date}
+                        onChange={e => handleUpdateEvent(idx, 'date', e.target.value)}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Waktu Acara</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="misal: 08:00 - 10:00 WIB"
+                        value={evt.time}
+                        onChange={e => handleUpdateEvent(idx, 'time', e.target.value)}
                       />
                     </div>
                   </div>
 
-                  {gift.platform === 'QRIS' && (
-                    <div className={styles.formGroup} style={{ marginTop: '10px' }}>
-                      <label
-                        className={styles.label}
-                        style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                      >
-                        <QrCode size={13} strokeWidth={1.75} />
-                        <span>Gambar Barcode QRIS</span>
-                      </label>
-                      <div className={styles.uploadRow}>
-                        <input
-                          type="url"
-                          className={styles.input}
-                          placeholder="https://... atau unggah barcode QRIS"
-                          value={gift.qris_image || ''}
-                          onChange={e => handleUpdateGift(idx, 'qris_image', e.target.value)}
-                        />
-                        <label className={styles.uploadBtn}>
-                          {uploadingField === `gift_${idx}` ? (
-                            <Loader2 size={13} className={styles.spinner} />
-                          ) : (
-                            <Upload size={13} strokeWidth={1.75} />
-                          )}
-                          <span>
-                            {uploadingField === `gift_${idx}` ? 'Mengunggah...' : 'Unggah Barcode'}
-                          </span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className={styles.uploadHiddenInput}
-                            disabled={uploadingField === `gift_${idx}`}
-                            onChange={e =>
-                              handleFileUpload(e, `gift_${idx}`, url =>
-                                handleUpdateGift(idx, 'qris_image', url)
-                              )
-                            }
-                          />
-                        </label>
-                      </div>
+                  <div className={styles.grid3}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Nama Tempat / Gedung</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="misal: Masjid Al-Ikhlas"
+                        value={evt.place}
+                        onChange={e => handleUpdateEvent(idx, 'place', e.target.value)}
+                      />
                     </div>
-                  )}
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Alamat Lengkap</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="misal: Jl. Melati No. 10, Jakarta Selatan"
+                        value={evt.address || ''}
+                        onChange={e => handleUpdateEvent(idx, 'address', e.target.value)}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Tautan Google Maps</label>
+                      <input
+                        type="url"
+                        className={styles.input}
+                        placeholder="https://maps.google.com/..."
+                        value={evt.maps_url || ''}
+                        onChange={e => handleUpdateEvent(idx, 'maps_url', e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
+
+            <button type="button" onClick={handleAddEvent} className={styles.btnAddEvent}>
+              <Plus size={13} strokeWidth={2} />
+              <span>Tambah Rangkaian Acara Lainnya</span>
+            </button>
           </div>
-        </div>
 
-        {/* Step 6: Media, Galeri & Musik */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>6. Musik, Galeri Foto & Kisah Cinta</h2>
-          <p className={styles.sectionDesc}>
-            Tambahkan musik latar kustom, tautan galeri foto, siaran langsung, dan kisah cinta
-          </p>
+          {/* Step 5: Quotes & Hadiah */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>5. Kutipan / Doa & Amplop Digital</h2>
+            <p className={styles.sectionDesc}>
+              Kutipan ayat suci dan rekening untuk kado pernikahan digital
+            </p>
 
-          <div className={styles.grid2}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                  <Music size={14} strokeWidth={1.75} />
-                  <span>Musik Latar (MP3 / Audio)</span>
-                </span>
-              </label>
-              <div className={styles.uploadRow}>
+              <label className={styles.label}>Kutipan Kata Mutiara / Doa</label>
+              <textarea
+                className={styles.textarea}
+                value={quoteText}
+                onChange={e => setQuoteText(e.target.value)}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Sumber / Tokoh / Ayat</label>
+              <input
+                type="text"
+                className={styles.input}
+                placeholder="misal: QS. Ar-Rum: 21"
+                value={quoteAttribution}
+                onChange={e => setQuoteAttribution(e.target.value)}
+              />
+            </div>
+
+            <div
+              style={{
+                marginTop: '20px',
+                paddingTop: '16px',
+                borderTop: '1px solid var(--border-light, #e4dfd5)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '12px',
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '14.5px',
+                    fontWeight: 600,
+                    color: 'var(--text-main, #181716)',
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Gift size={15} strokeWidth={1.75} />
+                  <span>Amplop Digital &amp; Multi-Rekening (Opsional)</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={handleAddGift}
+                  className={styles.btnAddGift}
+                  style={{ margin: 0 }}
+                >
+                  <Plus size={13} strokeWidth={2} />
+                  <span>Tambah Rekening / QRIS</span>
+                </button>
+              </div>
+
+              <p
+                style={{
+                  fontSize: '12.5px',
+                  color: 'var(--text-muted, #6b665f)',
+                  marginBottom: '14px',
+                }}
+              >
+                Anda dapat menambahkan beberapa rekening bank atau QRIS donasi sekaligus agar
+                memudahkan tamu memberikan tanda kasih.
+              </p>
+
+              <div className={styles.giftCardList}>
+                {gifts.map((gift, idx) => (
+                  <div key={idx} className={styles.giftCardItem}>
+                    <div className={styles.giftCardHeader}>
+                      <span className={styles.giftCardIndex}>Rekening / QRIS #{idx + 1}</span>
+                      {gifts.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGift(idx)}
+                          className={styles.btnRemoveGift}
+                          title="Hapus Rekening Ini"
+                        >
+                          <Trash2 size={12} strokeWidth={1.75} />
+                          <span>Hapus</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className={styles.grid3}>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Penyedia Layanan / Platform</label>
+                        <select
+                          className={styles.select}
+                          value={gift.platform}
+                          onChange={e => handleUpdateGift(idx, 'platform', e.target.value)}
+                        >
+                          <option value="BCA">BCA (Bank Central Asia)</option>
+                          <option value="Mandiri">Bank Mandiri</option>
+                          <option value="BRI">Bank BRI</option>
+                          <option value="BNI">Bank BNI</option>
+                          <option value="BSI">Bank Syariah Indonesia (BSI)</option>
+                          <option value="Bank Jago">Bank Jago</option>
+                          <option value="CIMB">CIMB Niaga</option>
+                          <option value="GoPay">GoPay</option>
+                          <option value="OVO">OVO</option>
+                          <option value="DANA">DANA</option>
+                          <option value="ShopeePay">ShopeePay</option>
+                          <option value="QRIS">QRIS Standar</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Atas Nama Rekening</label>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder="misal: Budi Santoso"
+                          value={gift.name}
+                          onChange={e => handleUpdateGift(idx, 'name', e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                          {gift.platform === 'QRIS'
+                            ? 'Nomor / Kode QRIS'
+                            : 'Nomor Rekening / No. HP'}
+                        </label>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder={
+                            gift.platform === 'QRIS' ? 'NMID / Kode Merchant' : 'misal: 1234567890'
+                          }
+                          value={gift.id}
+                          onChange={e => handleUpdateGift(idx, 'id', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {gift.platform === 'QRIS' && (
+                      <div className={styles.formGroup} style={{ marginTop: '10px' }}>
+                        <label
+                          className={styles.label}
+                          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                        >
+                          <QrCode size={13} strokeWidth={1.75} />
+                          <span>Gambar Barcode QRIS</span>
+                        </label>
+                        <div className={styles.uploadRow}>
+                          <label className={styles.uploadBtn}>
+                            {uploadingField === `gift_${idx}` ? (
+                              <Loader2 size={13} className={styles.spinner} />
+                            ) : (
+                              <Upload size={13} strokeWidth={1.75} />
+                            )}
+                            <span>
+                              {uploadingField === `gift_${idx}`
+                                ? 'Mengunggah...'
+                                : 'Unggah Barcode'}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className={styles.uploadHiddenInput}
+                              disabled={uploadingField === `gift_${idx}`}
+                              onChange={e =>
+                                handleFileUpload(e, `gift_${idx}`, url =>
+                                  handleUpdateGift(idx, 'qris_image', url)
+                                )
+                              }
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Step 6: Media, Galeri & Musik */}
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>6. Musik, Galeri Foto & Kisah Cinta</h2>
+            <p className={styles.sectionDesc}>
+              Tambahkan musik latar kustom, tautan galeri foto, siaran langsung, dan kisah cinta
+            </p>
+
+            <div className={styles.grid2}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Music size={14} strokeWidth={1.75} />
+                    <span>Musik Latar (MP3 / Audio)</span>
+                  </span>
+                </label>
+                <div className={styles.uploadRow}>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    placeholder="https://example.com/audio/song.mp3 atau unggah"
+                    value={musicUrl}
+                    onChange={e => setMusicUrl(e.target.value)}
+                  />
+                  <label className={styles.uploadBtn}>
+                    {uploadingField === 'music' ? (
+                      <Loader2 size={13} className={styles.spinner} />
+                    ) : (
+                      <Upload size={13} strokeWidth={1.75} />
+                    )}
+                    <span>{uploadingField === 'music' ? 'Mengunggah...' : 'Unggah'}</span>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className={styles.uploadHiddenInput}
+                      disabled={uploadingField === 'music'}
+                      onChange={e => handleFileUpload(e, 'music', setMusicUrl)}
+                    />
+                  </label>
+                </div>
+                <span className={styles.hint}>Format .mp3, .m4a, .wav, .aac. Maksimal 15MB.</span>
+
+                <div style={{ marginTop: '12px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#181716' }}>
+                    Pilihan Lagu Siap Pakai:
+                  </span>
+                  <div className={styles.presetMusicGrid}>
+                    {AUDIO_PRESETS.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className={`${styles.presetMusicCard} ${musicUrl === preset.url ? styles.presetMusicCardActive : ''}`}
+                        onClick={() => setMusicUrl(preset.url)}
+                      >
+                        <div className={styles.presetMusicTitle}>
+                          <span>{preset.name}</span>
+                          {musicUrl === preset.url && (
+                            <Check size={13} strokeWidth={2.5} color="#8a704c" />
+                          )}
+                        </div>
+                        <div className={styles.presetMusicArtist}>{preset.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>
+                  <span>URL Siaran Langsung (YouTube Live / Zoom)</span>
+                </label>
                 <input
                   type="url"
                   className={styles.input}
-                  placeholder="https://example.com/audio/song.mp3 atau unggah"
-                  value={musicUrl}
-                  onChange={e => setMusicUrl(e.target.value)}
+                  placeholder="https://youtube.com/live/..."
+                  value={streamingPlatform}
+                  onChange={e => setStreamingPlatform(e.target.value)}
                 />
+                <span className={styles.hint}>
+                  Tautan live streaming bagi tamu yang mengikuti secara virtual.
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.formGroup} style={{ marginTop: '16px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '6px',
+                }}
+              >
+                <label className={styles.label} style={{ margin: 0 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <ImageIcon size={14} strokeWidth={1.75} />
+                    <span>Daftar Galeri Foto (Satu URL per baris)</span>
+                  </span>
+                </label>
                 <label className={styles.uploadBtn}>
-                  {uploadingField === 'music' ? (
+                  {uploadingField === 'gallery' ? (
                     <Loader2 size={13} className={styles.spinner} />
                   ) : (
                     <Upload size={13} strokeWidth={1.75} />
                   )}
-                  <span>{uploadingField === 'music' ? 'Mengunggah...' : 'Unggah'}</span>
+                  <span>{uploadingField === 'gallery' ? 'Mengunggah...' : 'Unggah Foto'}</span>
                   <input
                     type="file"
-                    accept="audio/*"
+                    accept="image/*"
+                    multiple
                     className={styles.uploadHiddenInput}
-                    disabled={uploadingField === 'music'}
-                    onChange={e => handleFileUpload(e, 'music', setMusicUrl)}
+                    disabled={uploadingField === 'gallery'}
+                    onChange={handleGalleryUpload}
                   />
                 </label>
               </div>
-              <span className={styles.hint}>Format .mp3, .m4a, .wav, .aac. Maksimal 15MB.</span>
-
-              <div style={{ marginTop: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: '#181716' }}>
-                  Pilihan Lagu Siap Pakai:
-                </span>
-                <div className={styles.presetMusicGrid}>
-                  {AUDIO_PRESETS.map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      className={`${styles.presetMusicCard} ${musicUrl === preset.url ? styles.presetMusicCardActive : ''}`}
-                      onClick={() => setMusicUrl(preset.url)}
-                    >
-                      <div className={styles.presetMusicTitle}>
-                        <span>{preset.name}</span>
-                        {musicUrl === preset.url && (
-                          <Check size={13} strokeWidth={2.5} color="#8a704c" />
-                        )}
-                      </div>
-                      <div className={styles.presetMusicArtist}>{preset.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>
-                <span>URL Siaran Langsung (YouTube Live / Zoom)</span>
-              </label>
-              <input
-                type="url"
-                className={styles.input}
-                placeholder="https://youtube.com/live/..."
-                value={streamingPlatform}
-                onChange={e => setStreamingPlatform(e.target.value)}
-              />
-              <span className={styles.hint}>
-                Tautan live streaming bagi tamu yang mengikuti secara virtual.
-              </span>
-            </div>
-          </div>
-
-          <div className={styles.formGroup} style={{ marginTop: '16px' }}>
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '6px',
+                marginTop: '20px',
+                paddingTop: '16px',
+                borderTop: '1px solid var(--border-light, #e4dfd5)',
               }}
             >
-              <label className={styles.label} style={{ margin: 0 }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                  <ImageIcon size={14} strokeWidth={1.75} />
-                  <span>Daftar Galeri Foto (Satu URL per baris)</span>
-                </span>
-              </label>
-              <label className={styles.uploadBtn}>
-                {uploadingField === 'gallery' ? (
-                  <Loader2 size={13} className={styles.spinner} />
-                ) : (
-                  <Upload size={13} strokeWidth={1.75} />
-                )}
-                <span>{uploadingField === 'gallery' ? 'Mengunggah...' : 'Unggah Foto'}</span>
+              <h3
+                style={{
+                  fontSize: '14.5px',
+                  fontWeight: 600,
+                  color: 'var(--text-main, #181716)',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <Heart size={15} strokeWidth={1.75} />
+                <span>Kisah Cinta (Love Story)</span>
+              </h3>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Judul Kisah</label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className={styles.uploadHiddenInput}
-                  disabled={uploadingField === 'gallery'}
-                  onChange={handleGalleryUpload}
+                  type="text"
+                  className={styles.input}
+                  placeholder="misal: Awal Pertemuan hingga Janji Suci"
+                  value={storyTitle}
+                  onChange={e => setStoryTitle(e.target.value)}
                 />
-              </label>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Cerita Cinta</label>
+                <textarea
+                  className={styles.textarea}
+                  placeholder="Tuliskan kisah perjalanan cinta singkat Anda berdua..."
+                  rows={3}
+                  value={storyText}
+                  onChange={e => setStoryText(e.target.value)}
+                />
+              </div>
             </div>
-            <textarea
-              className={styles.textarea}
-              placeholder={
-                'https://images.unsplash.com/photo-1...\nhttps://images.unsplash.com/photo-2...'
-              }
-              rows={4}
-              value={galleryUrls}
-              onChange={e => setGalleryUrls(e.target.value)}
-            />
           </div>
 
-          <div
-            style={{
-              marginTop: '20px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--border-light, #e4dfd5)',
-            }}
-          >
-            <h3
-              style={{
-                fontSize: '14.5px',
-                fontWeight: 600,
-                color: 'var(--text-main, #181716)',
-                marginBottom: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
+          {/* Action Bar */}
+          <div className={styles.actionBar}>
+            <Link href="/dashboard/invitations" className={styles.cancelBtn}>
+              Batal
+            </Link>
+            <button
+              type="submit"
+              className={styles.submitBtn}
+              disabled={submitting || myTemplates.length === 0}
             >
-              <Heart size={15} strokeWidth={1.75} />
-              <span>Kisah Cinta (Love Story)</span>
-            </h3>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Judul Kisah</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="misal: Awal Pertemuan hingga Janji Suci"
-                value={storyTitle}
-                onChange={e => setStoryTitle(e.target.value)}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Cerita Cinta</label>
-              <textarea
-                className={styles.textarea}
-                placeholder="Tuliskan kisah perjalanan cinta singkat Anda berdua..."
-                rows={3}
-                value={storyText}
-                onChange={e => setStoryText(e.target.value)}
-              />
-            </div>
+              {submitting ? 'Menyimpan...' : 'Simpan & Buat Undangan'}
+            </button>
           </div>
-        </div>
-
-        {/* Action Bar */}
-        <div className={styles.actionBar}>
-          <Link href="/dashboard/invitations" className={styles.cancelBtn}>
-            Batal
-          </Link>
-          <button
-            type="submit"
-            className={styles.submitBtn}
-            disabled={submitting || myTemplates.length === 0}
-          >
-            {submitting ? 'Menyimpan...' : 'Simpan & Buat Undangan'}
-          </button>
-        </div>
-      </form>
+        </form>
+        <LivePreview
+          template={selectedTemplate}
+          groom={groomName}
+          bride={brideName}
+          date={eventDate}
+        />
+      </div>
     </div>
   );
 }

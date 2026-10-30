@@ -6,6 +6,52 @@ import { useToast } from '@/context/ToastContext';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { api } from '@/lib/api';
 import type { Template } from '@/types';
+import { ThemeBuilder, type ThemeBuilderValue } from './theme-builder';
+
+const DEFAULT_BUILDER_VALUE: ThemeBuilderValue = {
+  theme_config: {
+    version: 1,
+    colors: {
+      primary: '#8a704c',
+      secondary: '#c7b89d',
+      background: '#faf9f6',
+      surface: '#ffffff',
+      text: '#181716',
+      muted: '#6b665f',
+      border: '#e4dfd5',
+    },
+    fonts: { heading: 'Cormorant Garamond', body: 'Plus Jakarta Sans', accent: 'Alex Brush' },
+    layout: { content_width: 720, section_spacing: 80, border_radius: 0 },
+    background: { type: 'color', color: '#faf9f6' },
+  },
+  block_config: {
+    allowed_blocks: [
+      'cover',
+      'quote',
+      'couple',
+      'love_story',
+      'event',
+      'gallery',
+      'streaming',
+      'gift',
+      'rsvp',
+      'footer',
+    ],
+    default_order: [
+      'cover',
+      'quote',
+      'couple',
+      'love_story',
+      'event',
+      'gallery',
+      'streaming',
+      'gift',
+      'rsvp',
+      'footer',
+    ],
+    locked_blocks: [],
+  },
+};
 import Link from 'next/link';
 import { Palette, Plus, Edit2, Trash2, AlertCircle, CheckCircle2, X, Eye } from 'lucide-react';
 import styles from '../admin.module.css';
@@ -34,6 +80,12 @@ export default function AdminTemplatesPage() {
   const [formIsActive, setFormIsActive] = useState(true);
   const [formDeadlineDays, setFormDeadlineDays] = useState(30);
   const [formActiveDaysAfter, setFormActiveDaysAfter] = useState(7);
+  const [builderValue, setBuilderValue] = useState<ThemeBuilderValue>(DEFAULT_BUILDER_VALUE);
+
+  const normalizeBuilder = (tmpl?: Template | null): ThemeBuilderValue => ({
+    theme_config: tmpl?.theme_config || DEFAULT_BUILDER_VALUE.theme_config,
+    block_config: tmpl?.block_config || DEFAULT_BUILDER_VALUE.block_config,
+  });
 
   const fetchTemplates = useCallback(() => {
     if (!token) return;
@@ -61,6 +113,7 @@ export default function AdminTemplatesPage() {
     setFormIsActive(true);
     setFormDeadlineDays(30);
     setFormActiveDaysAfter(7);
+    setBuilderValue(normalizeBuilder());
     setModalOpen(true);
     setError(null);
   };
@@ -73,6 +126,7 @@ export default function AdminTemplatesPage() {
     setFormIsActive(tmpl.is_active);
     setFormDeadlineDays(tmpl.order_deadline_days);
     setFormActiveDaysAfter(tmpl.active_days_after);
+    setBuilderValue(normalizeBuilder(tmpl));
     setModalOpen(true);
     setError(null);
   };
@@ -91,6 +145,8 @@ export default function AdminTemplatesPage() {
       is_active: Boolean(formIsActive),
       order_deadline_days: Number(formDeadlineDays),
       active_days_after: Number(formActiveDaysAfter),
+      theme_config: builderValue.theme_config,
+      block_config: builderValue.block_config,
     };
 
     try {
@@ -419,6 +475,8 @@ export default function AdminTemplatesPage() {
                   <option value="false">Nonaktif (Disembunyikan)</option>
                 </select>
               </div>
+
+              <ThemeBuilder value={builderValue} onChange={setBuilderValue} />
 
               <div className={styles.modalFooter}>
                 <button

@@ -17,6 +17,8 @@ import {
   KeyRound,
   ExternalLink,
   Trash2,
+  Camera,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import styles from './profile.module.css';
@@ -29,6 +31,7 @@ export default function ProfilePage() {
   const [avatar, setAvatar] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -116,6 +119,30 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    e.target.value = '';
+
+    setUploading(true);
+    try {
+      const result = await api.uploadFile(token, file);
+      setAvatar(result.data.url);
+      toast.success(
+        'Foto profil berhasil diunggah. Klik Simpan Perubahan untuk memperbarui akun.',
+        'Foto Terunggah'
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Gagal mengunggah foto profil',
+        'Unggah Gagal'
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleClearAvatar = () => {
     setAvatar('');
   };
@@ -188,48 +215,75 @@ export default function ProfilePage() {
             <form onSubmit={handleSubmit} className={styles.form}>
               {/* Avatar Section */}
               <div className={styles.avatarSection}>
-                <div className={styles.avatarPreview}>
-                  {avatar.trim() ? (
-                    <img
-                      src={avatar.trim()}
-                      alt={name || 'Avatar'}
-                      className={styles.avatarImg}
-                      onError={e => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
+                <div className={styles.avatarWrapper}>
+                  <label
+                    className={`${styles.avatarUploadTarget} ${uploading ? styles.avatarUploading : ''}`}
+                    title="Klik untuk mengubah foto profil"
+                  >
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      className={styles.uploadHiddenInput}
+                      disabled={uploading}
+                      onChange={handleAvatarUpload}
                     />
-                  ) : (
-                    <div className={styles.avatarPlaceholder}>
-                      <span>{initials}</span>
+                    {avatar.trim() ? (
+                      <img
+                        src={avatar.trim()}
+                        alt={name || 'Avatar'}
+                        className={styles.avatarImg}
+                        onError={e => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className={styles.avatarPlaceholder}>
+                        <span>{initials}</span>
+                      </div>
+                    )}
+
+                    <div className={styles.avatarOverlay} aria-hidden="true">
+                      {uploading ? (
+                        <>
+                          <Loader2 size={20} className={styles.spinnerIcon} />
+                          <span className={styles.overlayText}>Mengunggah</span>
+                        </>
+                      ) : (
+                        <>
+                          <Camera size={20} strokeWidth={1.75} />
+                          <span className={styles.overlayText}>Ubah Foto</span>
+                        </>
+                      )}
                     </div>
-                  )}
+
+                    {!uploading && (
+                      <div className={styles.avatarBadge} aria-hidden="true">
+                        <Camera size={12} strokeWidth={2} />
+                      </div>
+                    )}
+                  </label>
                 </div>
 
                 <div className={styles.avatarControls}>
-                  <label className={styles.label}>Tautan Foto Profil (Avatar URL)</label>
-                  <div className={styles.avatarInputRow}>
-                    <input
-                      type="url"
-                      className={styles.input}
-                      placeholder="https://images.unsplash.com/... atau URL gambar lainnya"
-                      value={avatar}
-                      onChange={e => setAvatar(e.target.value)}
-                    />
-                    {avatar && (
+                  <div className={styles.avatarHeaderRow}>
+                    <label className={styles.label}>Foto Profil</label>
+                    {avatar.trim() && (
                       <button
                         type="button"
-                        className={styles.clearBtn}
+                        className={styles.removeAvatarBtn}
                         onClick={handleClearAvatar}
-                        title="Hapus foto profil"
+                        disabled={uploading}
+                        title="Hapus foto profil dan gunakan inisial"
                       >
-                        <Trash2 size={15} strokeWidth={1.75} />
+                        <Trash2 size={13} strokeWidth={1.75} />
+                        <span>Hapus Foto</span>
                       </button>
                     )}
                   </div>
-                  <span className={styles.helperText}>
-                    Gunakan tautan gambar langsung (JPG, PNG, atau WebP). Kosongkan untuk
-                    menggunakan inisial.
-                  </span>
+                  <p className={styles.helperText}>
+                    Klik langsung pada foto profil untuk mengunggah gambar baru dari perangkat.
+                    Format: JPG, PNG, atau WebP (maksimal 5MB).
+                  </p>
                 </div>
               </div>
 

@@ -23,6 +23,22 @@
   --success: #2e5a36;
   --danger: #8a2525;
   --warning: #8c6d1f;
+
+  /* Schema-driven theme token defaults */
+  --theme-primary: #8a704c;
+  --theme-secondary: #c7b89d;
+  --theme-background: #faf9f6;
+  --theme-surface: #ffffff;
+  --theme-text: #181716;
+  --theme-muted: #6b665f;
+  --theme-border: #e4dfd5;
+  --theme-heading-font: 'Cormorant Garamond';
+  --theme-body-font: 'Plus Jakarta Sans';
+  --theme-accent-font: 'Alex Brush';
+  --theme-content-width: 720px;
+  --theme-section-spacing: 80px;
+  --theme-border-radius: 0px;
+  --theme-background-image: none;
 }
 
 *,

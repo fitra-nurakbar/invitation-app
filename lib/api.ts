@@ -6,6 +6,7 @@ import {
   Order,
   UserTemplate,
   Message,
+  InvitationLayout,
   ApiResponse,
 } from '@/types';
 
@@ -117,6 +118,7 @@ export const api = {
       slug: string;
       event_date: string;
       detail: InvitationDetail;
+      layout?: InvitationLayout;
     }
   ) => request<ApiResponse<Invitation>>('/invitations', { method: 'POST', body, token }),
 
@@ -128,6 +130,8 @@ export const api = {
       event_date?: string;
       status?: string;
       detail?: InvitationDetail;
+      layout?: InvitationLayout;
+      expected_layout_version?: number;
     }
   ) => request<ApiResponse<Invitation>>(`/invitations/me/${id}`, { method: 'PUT', body, token }),
 

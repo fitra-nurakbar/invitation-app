@@ -1,6 +1,10 @@
 .wrapper {
   min-height: 100vh;
   background-color: var(--bg-primary, #faf9f6);
+  background-image: var(--theme-background-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: var(--text-main, #181716);
   overflow-x: hidden;
   position: relative;
@@ -186,7 +190,9 @@
 
 /* ─── Main Content Container ─── */
 .mainContainer {
-  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--theme-content-width, 680px);
   margin: 0 auto;
   background: var(--bg-card, #ffffff);
   border-left: 1px solid var(--border-light, #e4dfd5);
@@ -204,8 +210,9 @@
 
 .heroFrame {
   border: 1px solid var(--border-light, #e4dfd5);
-  padding: 48px 24px;
+  padding: clamp(24px, 8vw, 48px) clamp(14px, 4vw, 24px);
   background: #ffffff;
+  container-type: inline-size;
 }
 
 .heroSub {
@@ -220,7 +227,7 @@
 
 .heroTitle {
   font-family: var(--font-serif, Georgia, serif);
-  font-size: 42px;
+  font-size: clamp(26px, 9cqi, 42px);
   font-weight: 600;
   color: var(--text-main, #181716);
   margin: 0 0 16px;
@@ -238,37 +245,46 @@
 
 /* ─── Countdown ─── */
 .countdown {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  gap: clamp(6px, 2.5cqi, 12px);
 }
 
 .countdownItem {
   background: var(--bg-primary, #faf9f6);
   border: 1px solid var(--border-light, #e4dfd5);
   border-radius: 0;
-  padding: 10px 14px;
-  min-width: 64px;
+  padding: clamp(6px, 2.5cqi, 10px) clamp(4px, 2cqi, 12px);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .countdownValue {
   font-family: var(--font-serif, Georgia, serif);
-  font-size: 22px;
+  font-size: clamp(14px, 6cqi, 22px);
   font-weight: 600;
   color: var(--text-main, #181716);
   display: block;
+  line-height: 1.15;
 }
 
 .countdownLabel {
-  font-size: 10.5px;
+  font-size: clamp(8px, 2.8cqi, 10.5px);
   color: var(--text-muted, #6b665f);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 /* ─── Section Common ─── */
 .section {
-  padding: 56px 28px;
+  padding: var(--theme-section-spacing, 56px) 28px;
   text-align: center;
   border-bottom: 1px solid var(--border-light, #e4dfd5);
 }
